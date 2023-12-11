@@ -18,11 +18,10 @@ import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
 import { CustomerService } from "../customer.service";
 import { CustomerCreateInput } from "./CustomerCreateInput";
-import { CustomerWhereInput } from "./CustomerWhereInput";
-import { CustomerWhereUniqueInput } from "./CustomerWhereUniqueInput";
-import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
-import { CustomerUpdateInput } from "./CustomerUpdateInput";
 import { Customer } from "./Customer";
+import { CustomerFindManyArgs } from "./CustomerFindManyArgs";
+import { CustomerWhereUniqueInput } from "./CustomerWhereUniqueInput";
+import { CustomerUpdateInput } from "./CustomerUpdateInput";
 import { OrderFindManyArgs } from "../../order/base/OrderFindManyArgs";
 import { Order } from "../../order/base/Order";
 import { OrderWhereUniqueInput } from "../../order/base/OrderWhereUniqueInput";
@@ -31,8 +30,10 @@ export class CustomerControllerBase {
   constructor(protected readonly service: CustomerService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Customer })
-  async create(@common.Body() data: CustomerCreateInput): Promise<Customer> {
-    return await this.service.create({
+  async createCustomer(
+    @common.Body() data: CustomerCreateInput
+  ): Promise<Customer> {
+    return await this.service.createCustomer({
       data: {
         ...data,
 
@@ -63,9 +64,9 @@ export class CustomerControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Customer] })
   @ApiNestedQuery(CustomerFindManyArgs)
-  async findMany(@common.Req() request: Request): Promise<Customer[]> {
+  async customers(@common.Req() request: Request): Promise<Customer[]> {
     const args = plainToClass(CustomerFindManyArgs, request.query);
-    return this.service.findMany({
+    return this.service.customers({
       ...args,
       select: {
         id: true,
@@ -88,10 +89,10 @@ export class CustomerControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Customer })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  async findOne(
+  async customer(
     @common.Param() params: CustomerWhereUniqueInput
   ): Promise<Customer | null> {
-    const result = await this.service.findOne({
+    const result = await this.service.customer({
       where: params,
       select: {
         id: true,
@@ -120,12 +121,12 @@ export class CustomerControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Customer })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  async update(
+  async updateCustomer(
     @common.Param() params: CustomerWhereUniqueInput,
     @common.Body() data: CustomerUpdateInput
   ): Promise<Customer | null> {
     try {
-      return await this.service.update({
+      return await this.service.updateCustomer({
         where: params,
         data: {
           ...data,
@@ -165,11 +166,11 @@ export class CustomerControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Customer })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  async delete(
+  async deleteCustomer(
     @common.Param() params: CustomerWhereUniqueInput
   ): Promise<Customer | null> {
     try {
-      return await this.service.delete({
+      return await this.service.deleteCustomer({
         where: params,
         select: {
           id: true,
@@ -199,7 +200,7 @@ export class CustomerControllerBase {
 
   @common.Get("/:id/orders")
   @ApiNestedQuery(OrderFindManyArgs)
-  async findManyOrders(
+  async findOrders(
     @common.Req() request: Request,
     @common.Param() params: CustomerWhereUniqueInput
   ): Promise<Order[]> {
@@ -245,7 +246,7 @@ export class CustomerControllerBase {
         connect: body,
       },
     };
-    await this.service.update({
+    await this.service.updateCustomer({
       where: params,
       data,
       select: { id: true },
@@ -262,7 +263,7 @@ export class CustomerControllerBase {
         set: body,
       },
     };
-    await this.service.update({
+    await this.service.updateCustomer({
       where: params,
       data,
       select: { id: true },
@@ -279,7 +280,7 @@ export class CustomerControllerBase {
         disconnect: body,
       },
     };
-    await this.service.update({
+    await this.service.updateCustomer({
       where: params,
       data,
       select: { id: true },
