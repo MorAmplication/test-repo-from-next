@@ -18,11 +18,10 @@ import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
 import { ProductService } from "../product.service";
 import { ProductCreateInput } from "./ProductCreateInput";
-import { ProductWhereInput } from "./ProductWhereInput";
-import { ProductWhereUniqueInput } from "./ProductWhereUniqueInput";
-import { ProductFindManyArgs } from "./ProductFindManyArgs";
-import { ProductUpdateInput } from "./ProductUpdateInput";
 import { Product } from "./Product";
+import { ProductFindManyArgs } from "./ProductFindManyArgs";
+import { ProductWhereUniqueInput } from "./ProductWhereUniqueInput";
+import { ProductUpdateInput } from "./ProductUpdateInput";
 import { OrderFindManyArgs } from "../../order/base/OrderFindManyArgs";
 import { Order } from "../../order/base/Order";
 import { OrderWhereUniqueInput } from "../../order/base/OrderWhereUniqueInput";
@@ -31,8 +30,10 @@ export class ProductControllerBase {
   constructor(protected readonly service: ProductService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Product })
-  async create(@common.Body() data: ProductCreateInput): Promise<Product> {
-    return await this.service.create({
+  async createProduct(
+    @common.Body() data: ProductCreateInput
+  ): Promise<Product> {
+    return await this.service.createProduct({
       data: data,
       select: {
         id: true,
@@ -48,9 +49,9 @@ export class ProductControllerBase {
   @common.Get()
   @swagger.ApiOkResponse({ type: [Product] })
   @ApiNestedQuery(ProductFindManyArgs)
-  async findMany(@common.Req() request: Request): Promise<Product[]> {
+  async products(@common.Req() request: Request): Promise<Product[]> {
     const args = plainToClass(ProductFindManyArgs, request.query);
-    return this.service.findMany({
+    return this.service.products({
       ...args,
       select: {
         id: true,
@@ -66,10 +67,10 @@ export class ProductControllerBase {
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Product })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  async findOne(
+  async product(
     @common.Param() params: ProductWhereUniqueInput
   ): Promise<Product | null> {
-    const result = await this.service.findOne({
+    const result = await this.service.product({
       where: params,
       select: {
         id: true,
@@ -91,12 +92,12 @@ export class ProductControllerBase {
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Product })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  async update(
+  async updateProduct(
     @common.Param() params: ProductWhereUniqueInput,
     @common.Body() data: ProductUpdateInput
   ): Promise<Product | null> {
     try {
-      return await this.service.update({
+      return await this.service.updateProduct({
         where: params,
         data: data,
         select: {
@@ -121,11 +122,11 @@ export class ProductControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Product })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  async delete(
+  async deleteProduct(
     @common.Param() params: ProductWhereUniqueInput
   ): Promise<Product | null> {
     try {
-      return await this.service.delete({
+      return await this.service.deleteProduct({
         where: params,
         select: {
           id: true,
@@ -148,7 +149,7 @@ export class ProductControllerBase {
 
   @common.Get("/:id/orders")
   @ApiNestedQuery(OrderFindManyArgs)
-  async findManyOrders(
+  async findOrders(
     @common.Req() request: Request,
     @common.Param() params: ProductWhereUniqueInput
   ): Promise<Order[]> {
@@ -194,7 +195,7 @@ export class ProductControllerBase {
         connect: body,
       },
     };
-    await this.service.update({
+    await this.service.updateProduct({
       where: params,
       data,
       select: { id: true },
@@ -211,7 +212,7 @@ export class ProductControllerBase {
         set: body,
       },
     };
-    await this.service.update({
+    await this.service.updateProduct({
       where: params,
       data,
       select: { id: true },
@@ -228,7 +229,7 @@ export class ProductControllerBase {
         disconnect: body,
       },
     };
-    await this.service.update({
+    await this.service.updateProduct({
       where: params,
       data,
       select: { id: true },
